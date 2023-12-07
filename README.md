@@ -18,7 +18,7 @@ The abstract goal for this idea is to encourage users to engage with content thr
 
 6. Maieutics (Midwifery): Socrates saw himself as a "midwife" to ideas, helping others give birth to their own understanding by asking leading questions.
 
-### The Algorithm Identified
+### The Algorithm Identified --Incomplete
 
 1. Input - User input of Idea, Topic, Question, or statement.
 
