@@ -5,8 +5,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const outputDiv = document.getElementById('output');
   const addNewDiscussion = document.getElementById('addNewDiscussion');
 
+
   runButton.addEventListener('click', async () => {
-    outputDiv.textContent = 'Hello, World!';
+    try {
+      const response = await fetch('/api/hello');
+      if (response.ok) {
+          const data = await response.text();
+          console.log(data)
+          outputDiv.textContent = data;
+      } else {
+          outputDiv.textContent = 'Error fetching data from the backend.';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      outputDiv.textContent = 'An unexpected error occurred.';
+    }
   });
 
   addNewDiscussion.addEventListener('click', () => {
@@ -17,5 +30,5 @@ document.addEventListener('DOMContentLoaded', () => {
     container.appendChild(node);
   });
 
-  
+
 });
