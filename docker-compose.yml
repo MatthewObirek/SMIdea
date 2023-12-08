@@ -8,6 +8,14 @@ services:
       - "3001:3001"  # Map frontend port 3001 to host machine's port 3001
     volumes:
       - ./Frontend:/usr/share/nginx/html
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8080"
+    links:
+    - postgres_db
   postgres_db:
     image: postgres:latest
     container_name: PostgresCont 
