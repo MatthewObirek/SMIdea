@@ -18,6 +18,34 @@ void runHTTPserver() {
 
 }
 
+void Query(PGconn *conn, const char *query) {
+    std::cout << query << std::endl;
+    PGresult *response = PQexec(conn, query);
+
+    if (PQresultStatus(response) != PGRES_TUPLES_OK) {
+        std::cerr << "Query execution failed: " << PQresultErrorMessage(response) << std::endl;
+        PQclear(response);
+        PQfinish(conn);
+        return;
+    }
+
+    // Print the query result
+    int rows1 = PQntuples(response);
+    int cols1 = PQnfields(response);
+    std::cout << "Rows: " << rows1 << ", Cols: " << cols1 << std::endl; 
+    for (int i = 0; i < rows1; ++i) {
+        for (int j = 0; j < cols1; ++j) {
+            const char *value = PQgetvalue(response, i, j);
+            std::cout << "PSQL: " << value << "\t";
+        }
+    
+        std::cout << std::endl;
+    }
+    PQclear(response);
+}
+
+
+
 int databaseTestOps() {
 
     std::cout << "LOG: Hello, nerd! Test Time" << std::endl;
@@ -40,8 +68,41 @@ int databaseTestOps() {
     }
     std::cout << "LOG: Connection established" << std::endl;
     
+    Query(conn, "SELECT current_database()");
+
+    Query(conn, "SELECT datname FROM pg_database");
+
+    Query(conn, "SELECT table_name FROM information_schema.tables");
+
+    Query(conn, "SELECT * FROM postgres");
+
+    /*
+    const char *list = "SELECT datname FROM pg_database";
+    PGresult *check = PQexec(conn, list);
+
+    if (PQresultStatus(check) != PGRES_TUPLES_OK) {
+        std::cerr << "Query execution failed: " << PQresultErrorMessage(check) << std::endl;
+        PQclear(check);
+        PQfinish(conn);
+        return 1;
+    }
+
+    // Print the query result
+    int rows1 = PQntuples(check);
+    int cols1 = PQnfields(check);
+
+    for (int i = 0; i < rows1; ++i) {
+        for (int j = 0; j < cols1; ++j) {
+            const char *value = PQgetvalue(check, i, j);
+            std::cout << "PSQL: " << value << "\t";
+        }
+        std::cout << std::endl;
+    }
+    const char *db = "USE pg_database";
+    PGresult *dbs = PQexec(conn, db);
+
     // Perform a simple SELECT query
-    const char *query = "SELECT * FROM your_table_name";
+    const char *query = "SELECT * FROM postgres";
     PGresult *res = PQexec(conn, query);
 
     // Check if the query was successful
@@ -75,9 +136,9 @@ int databaseTestOps() {
         std::cout << "INSERT query successful!" << std::endl;
         PQclear(insertRes);
     }
-
+    //*/
     // Release the results and close the connection
-    PQclear(res);
+    // PQclear(res);
     PQfinish(conn);
 
     return 0;
