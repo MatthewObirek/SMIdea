@@ -13,10 +13,12 @@ void runHTTPserver() {
 
     svr.Get("/api/hello", [](const httplib::Request&, httplib::Response& res) {
         res.set_content("Hello, nerd!", "text/plain");
+        std::string str = "";
+        for (const auto& result : userList) {
+            str.append(result.c_str()).append("\n");
+        }
+        res.set_content(str, "text/plain");
 
-        // for (const auto& result : userList) {
-        //     res.set_content(result.c_str(), "text/plain");
-        // }
     });
 
     // std::cout << "hullo?" << std::endl;
