@@ -78,9 +78,11 @@ int databaseTestOps() {
     }
     std::cout << "LOG: Connection established" << std::endl;
     
-    //Query(conn, "DROP TABLE IF EXISTS users CASCADE;");
-    //Query(conn, "DROP TABLE IF EXISTS posts;");
+    // Used to makesure the tables are up to spec
+    Query(conn, "DROP TABLE IF EXISTS users CASCADE;");
+    Query(conn, "DROP TABLE IF EXISTS posts;");
 
+    
     PGresult *res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';");
     if (PQntuples(res) > 0) 
     {
