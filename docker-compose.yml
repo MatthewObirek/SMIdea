@@ -13,7 +13,7 @@ services:
       context: ./Backend
       dockerfile: Dockerfile
     ports:
-      - "3000:8080"
+      - "8080:8080"
     links:
     - postgres_db
   postgres_db:
