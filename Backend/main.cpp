@@ -78,6 +78,8 @@ int databaseTestOps() {
     }
     std::cout << "LOG: Connection established" << std::endl;
     
+    //Query(conn, "DROP TABLE IF EXISTS users CASCADE;");
+    //Query(conn, "DROP TABLE IF EXISTS posts;");
 
     PGresult *res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';");
     if (PQntuples(res) > 0) 
@@ -88,8 +90,22 @@ int databaseTestOps() {
     {
         std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
         PQclear(Query(conn, "DROP TABLE IF EXISTS users;"));
-        PQclear(Query(conn, "CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255), age INT);"));
+        PQclear(Query(conn, "CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
         PQclear(Query(conn, "INSERT INTO users (name, age) VALUES ('bob69', 20), ('zoe420', 30);"));
+
+    }
+    PQclear(res);
+    res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'posts';");
+    if (PQntuples(res) > 0) 
+    {
+        std::cout << "LOG: "<< PQgetvalue(res, 0, 0) << " EXISTS" << std::endl; 
+    }
+    else 
+    {
+        std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
+        PQclear(Query(conn, "DROP TABLE IF EXISTS posts;"));
+        PQclear(Query(conn, "CREATE TABLE posts (id SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
+        PQclear(Query(conn, "INSERT INTO posts (uName, content) VALUES ('bob69', 'Gary is a weirdo'), ('zoe420', 'you said it bob');"));
 
     }
     PQclear(res);
