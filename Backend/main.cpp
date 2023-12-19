@@ -1,22 +1,60 @@
 #include <iostream>
 #include <thread>
+#include <vector>
+#include <string>
 
 #include <httplib.h>
 #include <libpq-fe.h>
 
+std::vector<std::string> userList;
 
 void runHTTPserver() {
     httplib::Server svr;
 
     svr.Get("/api/hello", [](const httplib::Request&, httplib::Response& res) {
         res.set_content("Hello, nerd!", "text/plain");
+        std::string str = "";
+        for (const auto& result : userList) {
+            str.append(result.c_str()).append("        ");
+        }
+        res.set_content(str, "text/plain");
+
     });
 
+    // std::cout << "hullo?" << std::endl;
     // Add more endpoints as needed
 
     svr.listen("0.0.0.0", 8080);  // Listen on all available interfaces on port 8080
 
 }
+
+PGresult* Query(PGconn *conn, const char *query) {
+    std::cout << "Query:" << std::endl << query << std::endl;
+    PGresult *response = PQexec(conn, query);
+
+    if (PQresultStatus(response) != PGRES_COMMAND_OK && PQresultStatus(response) != PGRES_TUPLES_OK) {
+        std::cerr << "Query execution failed: " << PQresultErrorMessage(response) << std::endl;
+        PQclear(response);
+        PQfinish(conn);
+        return nullptr;
+    }
+
+    // Print the query result
+    int rows1 = PQntuples(response);
+    int cols1 = PQnfields(response);
+    std::cout << "PSQL: " << std::endl; 
+    for (int i = 0; i < rows1; ++i) {
+        for (int j = 0; j < cols1; ++j) {
+            const char *value = PQgetvalue(response, i, j);
+            std::cout << value << "\t";
+        }
+    
+        std::cout << std::endl;
+    }
+    return response;
+}
+
+
 
 int databaseTestOps() {
 
@@ -40,44 +78,56 @@ int databaseTestOps() {
     }
     std::cout << "LOG: Connection established" << std::endl;
     
-    // Perform a simple SELECT query
-    const char *query = "SELECT * FROM your_table_name";
-    PGresult *res = PQexec(conn, query);
+    // Used to makesure the tables are up to spec
+    Query(conn, "DROP TABLE IF EXISTS users CASCADE;");
+    Query(conn, "DROP TABLE IF EXISTS posts;");
 
-    // Check if the query was successful
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        std::cerr << "SELECT query failed: " << PQresultErrorMessage(res) << std::endl;
-        PQclear(res);
-        PQfinish(conn);
-        return 1;
+    
+    PGresult *res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';");
+    if (PQntuples(res) > 0) 
+    {
+        std::cout << "LOG: "<< PQgetvalue(res, 0, 0) << " EXISTS" << std::endl; 
     }
+    else 
+    {
+        std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
+        PQclear(Query(conn, "DROP TABLE IF EXISTS users;"));
+        PQclear(Query(conn, "CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
+        PQclear(Query(conn, "INSERT INTO users (name, age) VALUES ('bob69', 20), ('zoe420', 30);"));
 
-    // Print the results of the SELECT query
-    int rows = PQntuples(res);
-    int cols = PQnfields(res);
-
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            std::cout << PQgetvalue(res, i, j) << "\t";
-        }
-        std::cout << std::endl;
     }
-
-    // Perform a simple INSERT query
-    const char *insertQuery = "INSERT INTO your_table_name(column1, column2) VALUES('value1', 'value2')";
-    PGresult *insertRes = PQexec(conn, insertQuery);
-
-    // Check if the INSERT query was successful
-    if (PQresultStatus(insertRes) != PGRES_COMMAND_OK) {
-        std::cerr << "INSERT query failed: " << PQresultErrorMessage(insertRes) << std::endl;
-        PQclear(insertRes);
-    } else {
-        std::cout << "INSERT query successful!" << std::endl;
-        PQclear(insertRes);
-    }
-
-    // Release the results and close the connection
     PQclear(res);
+    res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'posts';");
+    if (PQntuples(res) > 0) 
+    {
+        std::cout << "LOG: "<< PQgetvalue(res, 0, 0) << " EXISTS" << std::endl; 
+    }
+    else 
+    {
+        std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
+        PQclear(Query(conn, "DROP TABLE IF EXISTS posts;"));
+        PQclear(Query(conn, "CREATE TABLE posts (id SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
+        PQclear(Query(conn, "INSERT INTO posts (uName, content) VALUES ('bob69', 'Gary is a weirdo'), ('zoe420', 'you said it bob');"));
+
+    }
+    PQclear(res);
+
+    PGresult *users = Query(conn, "SELECT * FROM users");
+    int rows1 = PQntuples(users);
+    int cols1 = PQnfields(users);
+    for (int i = 0; i < rows1; ++i) {
+        std::string user = "";
+        for (int j = 0; j < cols1; ++j) {
+            const char *value = PQgetvalue(users, i, j);
+            std::cout << value << "\t";
+            user.append(value).append("   ");  // Store the result in the global variable
+        }
+        userList.push_back(user);
+        
+    }
+
+
+    PQclear(users);
     PQfinish(conn);
 
     return 0;
