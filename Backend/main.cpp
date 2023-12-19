@@ -15,7 +15,7 @@ void runHTTPserver() {
         res.set_content("Hello, nerd!", "text/plain");
         std::string str = "";
         for (const auto& result : userList) {
-            str.append(result.c_str()).append("\n");
+            str.append(result.c_str()).append("        ");
         }
         res.set_content(str, "text/plain");
 
