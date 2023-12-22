@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const addNewDiscussion = document.getElementById('addNewDiscussion');
 
 
+  // Backend Post Retrieval 
   runButton.addEventListener('click', async () => {
     try {
       const response = await fetch('/api/hello');
       if (response.ok) {
           const data = await response.text();
-          console.log(data)
           outputDiv.textContent = data;
       } else {
           outputDiv.textContent = 'Error fetching data from the backend.';
@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+
+  // For creating new discussions
   addNewDiscussion.addEventListener('click', () => {
     const node = document.createElement('div');
     node.style = 'background: grey;';
