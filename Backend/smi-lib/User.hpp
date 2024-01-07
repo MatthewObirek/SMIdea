@@ -2,8 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Post.hpp"
-
+class Post;
 
 class User
 {

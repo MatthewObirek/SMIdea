@@ -1,5 +1,5 @@
 #include "User.hpp"
-
+#include "Post.hpp"
 
 //Empty constructor
 User::User() : User(-1, "NoName", 0) {}

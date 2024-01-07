@@ -10,9 +10,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_path(PostgreSQL_INCLUDE_DIR NAMES libpq-fe.h PATHS /usr/include/postgresql)
 
+
 # Include directories for the external libraries
 add_subdirectory(cpp-httplib)
 add_subdirectory(pgfe)
+
+#include smi-lib
+add_library(smi-lib 
+                "smi-lib/User.cpp"  "smi-lib/Post.cpp"
+                "smi-lib/User.hpp"  "smi-lib/Post.hpp"
+            )
 
 # Add the executable target
 add_executable(main "main.cpp")
@@ -24,7 +31,8 @@ target_link_libraries(main Threads::Threads)  # If using threads
 target_include_directories(main PRIVATE ${PostgreSQL_INCLUDE_DIR})
 target_link_libraries(main 
                         httplib
-                        pq)
+                        pq
+                        smi-lib)
 
 # Additional libraries or flags if needed
 # target_link_libraries(myapp other_library)
