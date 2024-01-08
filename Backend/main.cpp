@@ -5,6 +5,9 @@
 
 #include <httplib.h>
 #include <libpq-fe.h>
+#include <Post.hpp>
+#include <User.hpp>
+
 
 std::vector<std::string> userList;
 
@@ -140,6 +143,11 @@ int main () {
 
     // Start HTTP server in a separate thread
     std::thread httpServerThread(runHTTPserver);
+
+    User newUser(0, "jeffery", 5);
+    std::cout << newUser.getId() << std::endl;
+    std::cout << newUser.getName() << std::endl;
+    std::cout << newUser.getAge() << std::endl;
 
     // Run database operations in the main thread
     databaseTestOps();

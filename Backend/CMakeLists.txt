@@ -18,7 +18,6 @@ add_subdirectory(pgfe)
 #include smi-lib
 add_library(smi-lib 
                 "smi-lib/User.cpp"  "smi-lib/Post.cpp"
-                "smi-lib/User.hpp"  "smi-lib/Post.hpp"
             )
 
 # Add the executable target
@@ -28,6 +27,7 @@ add_executable(main "main.cpp")
 target_link_libraries(main Threads::Threads)  # If using threads
 
 # If using libpq, link the library
+target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/smi-lib)
 target_include_directories(main PRIVATE ${PostgreSQL_INCLUDE_DIR})
 target_link_libraries(main 
                         httplib
