@@ -24,6 +24,10 @@ public:
     //Deconstructor
     ~User();
 
-
+    //Getters
+    inline int getAge() { return age; }
+    inline int getId() { return id; }
+    inline std::string getName() { return name; }
+    inline std::vector<Post> getPostList() { return postList; }
 
 };
