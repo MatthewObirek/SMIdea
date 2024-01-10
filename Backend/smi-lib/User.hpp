@@ -30,4 +30,5 @@ public:
     inline std::string getName() { return name; }
     inline std::vector<Post> getPostList() { return postList; }
 
+    std::string toString();
 };

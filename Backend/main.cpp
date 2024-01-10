@@ -11,6 +11,8 @@
 
 std::vector<std::string> userList;
 
+
+
 void runHTTPserver() {
     httplib::Server svr;
 
@@ -117,15 +119,10 @@ int databaseTestOps() {
 
     PGresult *users = Query(conn, "SELECT * FROM users");
     int rows1 = PQntuples(users);
-    int cols1 = PQnfields(users);
     for (int i = 0; i < rows1; ++i) {
-        std::string user = "";
-        for (int j = 0; j < cols1; ++j) {
-            const char *value = PQgetvalue(users, i, j);
-            std::cout << value << "\t";
-            user.append(value).append("   ");  // Store the result in the global variable
-        }
-        userList.push_back(user);
+        User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
+        std::cout << "LOG1: "<< value.toString() << std::endl;
+        userList.push_back(value.toString());
         
     }
 
@@ -143,11 +140,6 @@ int main () {
 
     // Start HTTP server in a separate thread
     std::thread httpServerThread(runHTTPserver);
-
-    User newUser(0, "jeffery", 5);
-    std::cout << newUser.getId() << std::endl;
-    std::cout << newUser.getName() << std::endl;
-    std::cout << newUser.getAge() << std::endl;
 
     // Run database operations in the main thread
     databaseTestOps();

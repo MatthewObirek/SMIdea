@@ -12,3 +12,9 @@ User::User(User &&obj) noexcept
     : id(std::move(obj.id)), name(std::move(obj.name)), age(std::move(obj.age)) {} 
 //Deconstructor
 User::~User() {}
+
+
+std::string User::toString() 
+{
+    return "Id: " + std::to_string(id) + "\tName: " + name + "\tAge: " + std::to_string(age);
+}
