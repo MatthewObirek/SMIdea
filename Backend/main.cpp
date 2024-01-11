@@ -8,6 +8,7 @@
 #include <Post.hpp>
 #include <User.hpp>
 
+#include "PQWrapper.hpp"
 
 std::vector<std::string> userList;
 
@@ -63,12 +64,14 @@ PGresult* Query(PGconn *conn, const char *query) {
 
 int databaseTestOps() {
 
+
     std::cout << "LOG: Hello, nerd! Test Time" << std::endl;
 
     // Connection parameters
     const char *conninfo = "dbname=postgres user=postgres password=postgres123 host=postgres_db port=5432";
     
     std::cout << "LOG: " << conninfo << std::endl;
+    PQWrapper connection(conninfo);
 
     // Establish a connection to the database
     PGconn *conn = PQconnectdb(conninfo);

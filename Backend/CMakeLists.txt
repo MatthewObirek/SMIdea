@@ -19,14 +19,17 @@ add_subdirectory(pgfe)
 add_library(smi-lib 
                 "smi-lib/User.cpp"  "smi-lib/Post.cpp"
             )
+# file(GLOB SOURCES "*.cpp" "*.hpp")
+# add_executable(OrganizationExecutable ${SOURCES})
 
 # Add the executable target
-add_executable(main "main.cpp")
+add_executable(main "main.cpp" "PQWrapper.cpp")
 
 # Link necessary libraries
 target_link_libraries(main Threads::Threads)  # If using threads
 
 # If using libpq, link the library
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/smi-lib)
 target_include_directories(main PRIVATE ${PostgreSQL_INCLUDE_DIR})
 target_link_libraries(main 
