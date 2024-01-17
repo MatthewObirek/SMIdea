@@ -34,64 +34,24 @@ void runHTTPserver() {
 
 }
 
-PGresult* Query(PGconn *conn, const char *query) {
-    std::cout << "Query:" << std::endl << query << std::endl;
-    PGresult *response = PQexec(conn, query);
-
-    if (PQresultStatus(response) != PGRES_COMMAND_OK && PQresultStatus(response) != PGRES_TUPLES_OK) {
-        std::cerr << "Query execution failed: " << PQresultErrorMessage(response) << std::endl;
-        PQclear(response);
-        PQfinish(conn);
-        return nullptr;
-    }
-
-    // Print the query result
-    int rows1 = PQntuples(response);
-    int cols1 = PQnfields(response);
-    std::cout << "PSQL: " << std::endl; 
-    for (int i = 0; i < rows1; ++i) {
-        for (int j = 0; j < cols1; ++j) {
-            const char *value = PQgetvalue(response, i, j);
-            std::cout << value << "\t";
-        }
-    
-        std::cout << std::endl;
-    }
-    return response;
-}
-
-
 
 int databaseTestOps() {
 
 
-    std::cout << "LOG: Hello, nerd! Test Time" << std::endl;
-
     // Connection parameters
     const char *conninfo = "dbname=postgres user=postgres password=postgres123 host=postgres_db port=5432";
-    
-    std::cout << "LOG: " << conninfo << std::endl;
     PQWrapper connection(conninfo);
 
+    
     // Establish a connection to the database
     PGconn *conn = PQconnectdb(conninfo);
-    
-    std::cout << "LOG: Connection attempted" << std::endl;
 
-    // Check if the connection was successful
-    if (PQstatus(conn) != CONNECTION_OK) {
-        std::cerr << "Connection to database failed: " << PQerrorMessage(conn) << std::endl;
-        PQfinish(conn);
-        return 1;
-    }
-    std::cout << "LOG: Connection established" << std::endl;
-    
     // Used to makesure the tables are up to spec
-    Query(conn, "DROP TABLE IF EXISTS users CASCADE;");
-    Query(conn, "DROP TABLE IF EXISTS posts;");
+    connection.Query("DROP TABLE IF EXISTS users CASCADE;");
+    connection.Query("DROP TABLE IF EXISTS posts;");
 
     
-    PGresult *res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';");
+    PGresult *res = connection.Query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';");
     if (PQntuples(res) > 0) 
     {
         std::cout << "LOG: "<< PQgetvalue(res, 0, 0) << " EXISTS" << std::endl; 
@@ -99,13 +59,13 @@ int databaseTestOps() {
     else 
     {
         std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
-        PQclear(Query(conn, "DROP TABLE IF EXISTS users;"));
-        PQclear(Query(conn, "CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
-        PQclear(Query(conn, "INSERT INTO users (name, age) VALUES ('bob69', 20), ('zoe420', 30);"));
+        PQclear(connection.Query("DROP TABLE IF EXISTS users;"));
+        PQclear(connection.Query("CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
+        PQclear(connection.Query("INSERT INTO users (name, age) VALUES ('bob69', 20), ('zoe420', 30);"));
 
     }
     PQclear(res);
-    res = Query(conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'posts';");
+    res = connection.Query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'posts';");
     if (PQntuples(res) > 0) 
     {
         std::cout << "LOG: "<< PQgetvalue(res, 0, 0) << " EXISTS" << std::endl; 
@@ -113,14 +73,14 @@ int databaseTestOps() {
     else 
     {
         std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
-        PQclear(Query(conn, "DROP TABLE IF EXISTS posts;"));
-        PQclear(Query(conn, "CREATE TABLE posts (id SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
-        PQclear(Query(conn, "INSERT INTO posts (uName, content) VALUES ('bob69', 'Gary is a weirdo'), ('zoe420', 'you said it bob');"));
+        PQclear(connection.Query("DROP TABLE IF EXISTS posts;"));
+        PQclear(connection.Query("CREATE TABLE posts (id SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
+        PQclear(connection.Query("INSERT INTO posts (uName, content) VALUES ('bob69', 'Gary is a weirdo'), ('zoe420', 'you said it bob');"));
 
     }
     PQclear(res);
 
-    PGresult *users = Query(conn, "SELECT * FROM users");
+    PGresult *users = connection.Query("SELECT * FROM users");
     int rows1 = PQntuples(users);
     for (int i = 0; i < rows1; ++i) {
         User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
