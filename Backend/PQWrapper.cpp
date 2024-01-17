@@ -41,3 +41,43 @@ PGresult* PQWrapper::Query(const char *query) {
     }
     return response;
 }
+
+
+std::vector<Post> PQWrapper::getPosts()
+{
+    std::vector<std::string> userList;
+    PGresult *users = this->Query("SELECT * FROM users");
+    int rows1 = PQntuples(users);
+    for (int i = 0; i < rows1; ++i) {
+        User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
+        std::cout << "LOG1: "<< value.toString() << std::endl;
+        userList.push_back(value.toString());
+        
+    }
+    std::vector<Post> postList;
+    return postList;
+}
+std::vector<User> PQWrapper::getUsers()
+{
+    std::vector<std::string> TextList;
+    PGresult *users = this->Query("SELECT * FROM users");
+    int rows1 = PQntuples(users);
+    for (int i = 0; i < rows1; ++i) {
+        User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
+        std::cout << "LOG1: "<< value.toString() << std::endl;
+        TextList.push_back(value.toString());
+        
+    }
+    std::vector<User> userList;
+    return userList;
+}
+
+
+std::vector<Post> PQWrapper::getPostsOf(User user)
+{
+
+}
+std::vector<User> PQWrapper::getUsersOf()
+{
+
+}
