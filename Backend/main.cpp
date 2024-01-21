@@ -60,7 +60,7 @@ int databaseTestOps() {
     {
         std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
         PQclear(connection.Query("DROP TABLE IF EXISTS users;"));
-        PQclear(connection.Query("CREATE TABLE users ( id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
+        PQclear(connection.Query("CREATE TABLE users ( uId SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE, age INT);"));
         PQclear(connection.Query("INSERT INTO users (name, age) VALUES ('bob69', 20), ('zoe420', 30);"));
 
     }
@@ -74,7 +74,7 @@ int databaseTestOps() {
     {
         std::cout << "LOG: Error: Table not found, [running basic script, replace with other later]" << std::endl; 
         PQclear(connection.Query("DROP TABLE IF EXISTS posts;"));
-        PQclear(connection.Query("CREATE TABLE posts (id SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
+        PQclear(connection.Query("CREATE TABLE posts (pId SERIAL PRIMARY KEY, uName VARCHAR(255) REFERENCES users(name),content TEXT);"));
         PQclear(connection.Query("INSERT INTO posts (uName, content) VALUES ('bob69', 'Gary is a weirdo'), ('zoe420', 'you said it bob');"));
 
     }
