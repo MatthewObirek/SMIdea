@@ -86,9 +86,8 @@ int databaseTestOps() {
         User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
         std::cout << "LOG1: "<< value.toString() << std::endl;
         userList.push_back(value.toString());
-        
+        connection.getPostsOf(value.getName());
     }
-
 
     PQclear(users);
     PQfinish(conn);

@@ -78,10 +78,12 @@ std::vector<Post> PQWrapper::getPosts()
     std::vector<Post> postList;
     PGresult *users = this->Query("SELECT uName, content, uId, age FROM posts INNER JOIN users ON posts.uName = users.name");
     int rows1 = PQntuples(users);
+    postList.reserve(rows1);
     for (int i = 0; i < rows1; ++i) {
         User user(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
         const std::string content(PQgetvalue(users, i, 1));
         Post value(content, &user);
+        postList.emplace_back(value);
         // std::cout << "Post"<<i<<": "<< value.toString() << std::endl;
         
     }
@@ -92,11 +94,11 @@ std::vector<User> PQWrapper::getUsers()
     std::vector<User> userList;
     PGresult *users = this->Query("SELECT * FROM users");
     int rows1 = PQntuples(users);
-
+    userList.reserve(rows1);
     for (int i = 0; i < rows1; ++i) {
         User value(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
         std::cout << "User"<<i<<": "<< value.toString() << std::endl;
-        userList.push_back(value);
+        userList.emplace_back(value);
         
     }
     return userList;
@@ -110,10 +112,12 @@ std::vector<Post> PQWrapper::getPostsOf(std::string userName)
     const char* params[1] = {userName.c_str()};
     PGresult* users = this->QueryParams(query.c_str(), 1, nullptr, params, nullptr, nullptr, 0);
     int rows1 = PQntuples(users);
+    postList.reserve(rows1);
     for (int i = 0; i < rows1; ++i) {
         User user(atoi(PQgetvalue(users, i, 0)), PQgetvalue(users, i, 1), atoi(PQgetvalue(users, i, 2)));
         const std::string content(PQgetvalue(users, i, 1));
         Post value(content, &user);
+        postList.emplace_back(value);
         // std::cout << "Post"<< i <<": "<< value.toString() << std::endl;
         
     }
