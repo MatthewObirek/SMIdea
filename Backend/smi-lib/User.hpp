@@ -9,14 +9,14 @@ class User
 private:
     int id;
     int age;
-    std::string name;
+    const char* name;
 
     std::vector<Post> postList;    
 public:
     //Empty constructor
     User();
     //Primary constructor
-    User(int id, const std::string name, int age);
+    User(int id, const char* name, int age);
     //Copy Constructor
     User(const User &obj);
     //Move Constructor
@@ -27,7 +27,7 @@ public:
     //Getters
     inline int getAge() { return age; }
     inline int getId() { return id; }
-    inline std::string getName() { return name; }
+    const char* getName() { return name; }
     inline std::vector<Post> getPostList() { return postList; }
 
     std::string toString();

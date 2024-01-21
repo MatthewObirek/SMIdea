@@ -4,7 +4,7 @@
 //Empty constructor
 User::User() : User(-1, "NoName", 0) {}
 //Primary constructor
-User::User(int id, const std::string name, int age) :id(id), name(name), age(age) {}
+User::User(int id, const char* name, int age) :id(id), name(name), age(age) {}
 //Copy Constructor
 User::User(const User &obj) : id(obj.id), name(obj.name), age(obj.age) {}
 //Move Constructor
